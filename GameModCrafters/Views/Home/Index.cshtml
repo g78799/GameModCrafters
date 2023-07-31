@@ -1,0 +1,241 @@
+﻿@model HomeIndexViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container my-4">
+    <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            @for (var i = 0; i < Model.Games.Count; i++)
+            {
+                <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" aria-label="Slide @i"></button>
+            }
+        </div>
+
+        <div class="carousel-inner carousel-custom-height">
+            @for (var i = 0; i < Model.Games.Count; i++)
+            {
+                var game = Model.Games[i];
+                <div class="carousel-item @(i == 0 ? "active" : "")" data-bs-interval="3000">
+                    <a href="@Url.Action("Details", "Games", new { id = game.GameId })">
+                        <img src="@game.Thumbnail" class="d-block w-100" alt="...">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>@game.GameName</h5>
+                            <p>@game.Description</p>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <button class="carousel-control-prev " type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <div class="Bulletin">
+                <div class="BulletinTitle">
+                    <h3 class="title">公告：</h3>
+                    <h4 class="list">公告列表 ></h4>
+                </div>
+                <div id="AnnouncementsList"></div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="Bulletin">
+                <div class="BulletinTitle">
+                    <h3 class="title">最新消息：</h3>
+                    <h4 class="list">消息列表 ></h4>
+                </div>
+                <div id="NewsList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-4 mod">
+    <h3>熱門Mod：</h3>
+    <div class="row" id="modCardRow">
+        @foreach (var mod in Model.Mods)
+        {
+            <div class="col-12 col-md-3 mt-3">
+                <div class="card">
+                    <div class="pic">
+                        <a href="@Url.Action("Details","Mods",  new { id = mod.ModId })">
+                            <img src=@(mod.Thumbnail == null ? "https://picsum.photos/300/200/?random=10" : mod.Thumbnail)>
+                        </a>
+                    </div>
+                    <div class="text">
+                        <div class="name_price">
+                            <h3 class="name">@mod.ModName</h3>
+                            <h3 class="price">@(mod.Price == 0 ? "Free" : mod.Price + " Mod Coin")</h3>
+                        </div>
+                        <div class="detail">
+                            <h2 class="tag" id="tag-id-@(mod.ModId)"><span class="badge bg-secondary" id="previewGame">@mod.GameName</span></h2>
+                            <h3 class="author"><span>作者：</span>@mod.AuthorName</h3>
+                            <h3 class="creatTime"><span>上傳日期：</span>@mod.CreateTime</h3>
+                            <h3 class="UpdateTime"><span>更新日期：</span>@mod.UpdateTime</h3>
+                            <p class="describe" id="describe-id-@(mod.ModId)"></p>
+                        </div>
+                    </div>
+                    <div class="data">
+                        <h3><span>容量：</span>@mod.Capacity KB</h3>
+                        <h3><span>點贊：</span>@mod.LikeCount</h3>
+                        <h3><span>收藏：</span>@mod.FavoriteCount</h3>
+                        <h3><span>下載：</span>@mod.DownloadCount</h3>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="container my-4 author">
+    <h3>熱門作者：</h3>
+    <div class="row" id="authorRow">
+        @foreach(var author in Model.Author)
+        {
+            <div class="col-12 col-md-3">
+                <a href="/Account/OtherPage/@author.Email">
+                    <div class="card">
+                        <div class="pic">
+                            <img src=@(author.BackgroundImage == null ? "https://picsum.photos/300/200/?random=1" : author.BackgroundImage)>
+                        </div>
+                        <div class="authorData">
+                            <h3 class="name">@author.Name</h3>
+                            <div class="detail">
+                                <div>作品數量：@author.WorkCount</div>
+                                <div>獲讚數：@author.LikeCount</div>
+                            </div>
+                        </div>
+                        <div class="avatar">
+                            <img src=@(author.Avatar == null ? "https://picsum.photos/300/200/?random=1" : author.Avatar)>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal -->
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog .modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Modal body text goes here.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section css{
+    <link rel="stylesheet" href="~/css/HomePageStyle.css" />
+}
+
+@section js{
+
+    <script>
+
+        function AddTag() {
+            @foreach (var mod in Model.Mods)
+            {
+                <text>
+                    var tagContainer = document.getElementById("tag-id-@(mod.ModId)");
+                    var tagNames = @Html.Raw(Json.Serialize(mod.TagNames));
+                    tagNames.forEach(function (tagName) {
+                        var spanElement = document.createElement("span");
+                        spanElement.className = "badge bg-secondary";
+                        spanElement.textContent = tagName;
+                        tagContainer.appendChild(spanElement);
+                    });
+                </text>
+            }
+        }
+
+        function AddDescribe() {
+            @foreach (var mod in Model.Mods)
+            {
+                <text>
+                                        var description = '@Html.Raw(mod.Description)';
+                    var describe = $("#describe-id-@mod.ModId");
+
+                    var $description = $("<div>").html(description);
+                    $description.find("img").remove();
+
+                    describe.html($description.html());
+                </text>
+            }
+        }
+
+        function AddAnnouncements() {
+            let AnnouncementsList = $("#AnnouncementsList")
+            let NewsList = $("#NewsList")
+
+            $.ajax({
+                url: '/Home/GetAnnouncements',
+                type: 'GET',
+                dataType: 'json',
+                success: function (announcements) {
+                    announcements.forEach(function (announcement, index) {
+                        let button = $('<button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal">\
+                            <span class="badge bg-secondary">'+ announcement.tag + '</span> ' + announcement.title + '\
+                            </button>').click(function () {
+                                updateModal(announcement.title, announcement.content);
+                            });
+
+                        AnnouncementsList.append(button);
+                    });
+                }
+            });
+
+            $.ajax({
+                url: '/Home/GetNews',
+                type: 'GET',
+                dataType: 'json',
+                success: function (news) {
+                    news.forEach(function (newsItem) {
+                        let button = $('<button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal">\
+                            <span class="badge bg-secondary">'+ newsItem.tag + '</span> ' + newsItem.title + '\
+                            </button>').click(function () {
+                                updateModal(newsItem.title, newsItem.content);
+                            });
+
+                        NewsList.append(button);
+                    });
+                }
+            });
+        }
+
+        function updateModal(title, body) {
+            $(".modal .modal-title").text(title);
+            $(".modal .modal-body p").text(body);
+            $('.modal').modal('show');
+        }
+
+        $(() => {
+            AddTag();
+            AddDescribe();
+            AddAnnouncements();
+        })
+    </script>
+}

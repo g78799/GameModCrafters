@@ -1,0 +1,215 @@
+﻿.chatbox{
+    z-index:10;
+}
+
+.chatbox .chat-box {
+    height: 400px;
+    width:500px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+}
+
+.chatbox .mySelf {
+    direction: rtl;
+}
+
+    .chatbox .mySelf .message {
+        margin-bottom: 10px;
+        padding: 5px;
+        border-radius: 5px;
+        font-size: 14px;
+        background-color: #f2f2f2;
+        word-wrap: break-word;
+        max-width: 100px;
+        width: fit-content;
+        direction: rtl;
+    }
+
+.chatbox .from {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.chatbox .time {
+    display: block;
+    font-size: 12px;
+    color: #999;
+    width: 100%;
+}
+
+.chatbox .sent {
+    background-color: #b3d9ff;
+}
+
+.chatbox .received {
+    background-color: #f2f2f2;
+}
+
+.chatbox .input-box {
+    display: flex;
+    margin-top: 10px;
+}
+
+    .chatbox .input-box input[type="text"] {
+        flex-grow: 1;
+        padding: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+
+    .chatbox .input-box input[type="submit"] {
+        padding: 5px 10px;
+        background-color: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+.chatbox .room {
+    display: flex;
+    width: fit-content;
+    border: #ccc 1px solid;
+    padding: 1px;
+    border-radius: 4px;
+}
+
+.chatbox .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width:100%;
+}
+
+.chatbox .sliderroom {
+    width: 100%;
+    border: #ccc solid 1px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+    .chatbox .room-link {
+        text-decoration: none;
+        color: gray;
+        display:flex;
+        flex-direction:row;
+        gap: 3px;
+        align-items:center;
+        justify-content:space-between;
+    }
+
+.chatbox .sliderroom:hover {
+    background-color: antiquewhite;
+    min-width: 20px;
+    overflow: hidden;
+    border: #ccc solid 1px;
+    border-radius: 4px;
+}
+
+.chatbox .sliderroom.active {
+    background-color: antiquewhite;
+}
+
+.chatbox .Container .span {
+    background-color: #b3d9ff;
+    height: fit-content;
+    text-align: center;
+    width: fit-content;
+    padding: 5px 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+}
+
+.chatbox .Container {
+    width: fit-content;
+    position: fixed;
+    right: 20px;
+    transform: top 1s;
+    transition: 0.2s;
+    background-color:white;
+}
+
+.messageli {
+    width: 100%;
+    display: flex;
+}
+
+.rightli {
+    justify-content: flex-end;
+}
+
+.leftli {
+    justify-content: flex-start;
+}
+
+.messages {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+}
+
+.left {
+    background-color: #ddd;
+}
+
+.right {
+    background-color: #aaf;
+}
+
+.btn.active {
+    border:none !important;
+}
+
+.sliderroom .btn{
+    width:100%;
+}
+
+.sidebar-frame{
+    width:fit-content;
+}
+
+.sidebar-search{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    margin-bottom:10px;
+}
+
+.exclamation-mark{
+    display:block;
+    width:15px;
+    height:15px;
+    background-color:red;
+    border-radius:50%;
+    color:white;
+    font-size:5px;
+}
+
+.markNone{
+    display:none;
+}
+
+#ChatBoxSpan{
+    cursor:pointer;
+    font-size:18px;
+    padding:5px 20px;
+}
+
+.blink {
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}

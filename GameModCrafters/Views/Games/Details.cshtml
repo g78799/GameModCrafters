@@ -1,0 +1,368 @@
+﻿@model PagedModsModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="Game_Cover">
+    <div class="ImgWrap">
+        <img src="@ViewBag.Game.Thumbnail" class="img-fluid Img_cover" alt="">
+    </div>
+
+    <div class="GameName">
+        <h1>@ViewBag.Game.GameName</h1>
+    </div>
+</div>
+
+<div class="bg_color">
+    <div class="container-fluid more_mods" id="modList">
+        <div class="label_tag">
+            <nav>
+                <button class="release_area bttn active">
+                    <h5>MOD區</h5>
+                </button>
+
+                <button class="commissioned_area bttn">
+                    <h5>委託區</h5>
+                </button>
+            </nav>
+        </div>
+
+        <div class="More_mod_mark paging_title active">
+            <div class="titleorALL">
+                <div class="text" id="myTarget">
+                    <h3>搜索MOD：</h3>
+                </div>
+            </div>
+
+            <div class="ModGameClassification">
+                <form id="filterForm" method="get" class="filter-form">
+                    <div class="form-group">
+                        <label for="timeFilter">時間：</label>
+                        <select id="timeFilter" name="timeFilter" class="form-control">
+                            <option value="">全部</option>
+                            <option value="1">一天內</option>
+                            <option value="7">一周內</option>
+                            <option value="30">一個月內</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sortFilter">排序：</label>
+                        <select id="sortFilter" name="sortFilter" class="form-control">
+                            <option value="uploadTime">上傳時間</option>
+                            <option value="updateTime">更新時間</option>
+                            <option value="downloadCount">下載量</option>
+                            <option value="name">名字</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderFilter">正反序：</label>
+                        <select id="orderFilter" name="orderFilter" class="form-control">
+                            <option value="desc">反序</option>
+                            <option value="asc">正序</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pageSize">每次顯示的數量：</label>
+                        <select id="pageSize" name="pageSize" class="form-control">
+                            <option value="8">8</option>
+                            <option value="16">16</option>
+                            <option value="24">24</option>
+                            <option value="32">32</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tagFilter">標籤：</label>
+                        <select id="tagFilter" name="tagFilter" class="form-control">
+                            <option value="">全部</option>
+                            @foreach (var tag in ViewBag.Tags)
+                            {
+                                <option value="@tag.TagId">@tag.TagName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="Search">搜索：</label>
+                        <input type="text" name="searchString" placeholder="Search" id="Search" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primar">應用過濾</button>
+                    </div>
+                </form>
+
+                <a class="upload-button" asp-controller="Mods" asp-action="Create" asp-route-gameId="@Model.GameId">
+                    <h4>上傳新Mod</h4>
+                </a>
+            </div>
+
+        </div>
+
+        <div class="entrust_mark paging_title">
+            <div class="titleorALL">
+                <div class="text">
+                    <h3>Mod委託</h3>
+                </div>
+            </div>
+            <div class="entrustClassification">
+                <form id="CommissionSearchForm" method="get" class="filter-form">
+                    <div class="form-group">
+                        <label for="CommissiontimeFilter">時間：</label>
+                        <select id="CommissiontimeFilter" name="CommissiontimeFilter" class="form-control">
+                            <option value="">全部</option>
+                            <option value="1">一天內</option>
+                            <option value="7">一周內</option>
+                            <option value="30">一個月內</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="CommissionsortFilter">排序：</label>
+                        <select id="CommissionsortFilter" name="CommissionsortFilter" class="form-control">
+                            <option value="uploadTime">上傳時間</option>
+                            <option value="updateTime">更新時間</option>
+                            <option value="name">名字</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="CommissionorderFilter">正反序：</label>
+                        <select id="CommissionorderFilter" name="CommissionorderFilter" class="form-control">
+                            <option value="desc">反序</option>
+                            <option value="asc">正序</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="CommissionpageSize">每次顯示的數量：</label>
+                        <select id="CommissionpageSize" name="CommissionpageSize" class="form-control">
+                            <option value="8">8</option>
+                            <option value="16">16</option>
+                            <option value="24">24</option>
+                            <option value="32">32</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="CommissionSearch">搜索：</label>
+                        <input type="text" name="CommissionsearchString" placeholder="Search" id="CommissionSearch" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">應用過濾</button>
+                    </div>
+                </form>
+
+                    <a class="upload-button" asp-controller="Commissions" asp-action="Create" asp-route-gameId="@Model.GameId">
+                        <h4>新增委託</h4>
+                    </a>
+            </div>
+           
+        </div>
+
+    </div>
+    <div class="more_mods_wrap ShowGameMod paging active">
+        @await Html.PartialAsync("_ModListPartial", Model)
+    </div>
+
+    <div class="container entrust Release_Area_Wrap paging" id="commissionsContainer"></div>
+
+    <div class="container forum">
+
+        <h5>討論區連結</h5>
+        <i class="fi fi-ss-redo"></i>
+        <div class="Border"></div>
+        <div class="forum_link">
+            <div class="Bahamut">
+                <div class="bahamut_img">
+                    <a href=""><img src="https://i2.bahamut.com.tw/baha_logo5.svg" alt=""></a>
+                </div>
+            </div>
+            <div class="NGA">
+                <div class="NGA_img">
+                    <a href="">
+                        <h5>NGA</h5>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section css{
+    <link rel="stylesheet" href="~/css/GamePage_style.css" />
+}
+
+@section js{
+    <script>
+        $(document).ready(function () {
+            GetRelease_Area();
+            AddTag();
+            AddDescribe();
+        });
+
+        function GetRelease_Area() {
+            let release_area = document.querySelectorAll(".bttn")
+            release_area.forEach(function (btn, index) {
+                btn.addEventListener('click', function () {
+                    console.log("111")
+                    document.getElementsByClassName("paging active")[0].classList.remove('active')
+                    document.getElementsByClassName("paging")[index].classList.add("active")
+                    document.getElementsByClassName("paging_title active")[0].classList.remove('active')
+                    document.getElementsByClassName("paging_title")[index].classList.add("active")
+
+                    document.getElementsByClassName("bttn active")[0].classList.remove('active')
+                    document.getElementsByClassName("bttn")[index].classList.add("active")
+
+                })
+            })
+        }
+
+        function AddTag() {
+            @foreach (var mod in Model.Mods)
+                {
+                    <text>
+                        var tagContainer = document.getElementById("tag-id-@(mod.ModId)");
+                        var tagNames = @Html.Raw(Json.Serialize(mod.TagNames));
+                        tagNames.forEach(function (tagName) {
+                            var spanElement = document.createElement("span");
+                            spanElement.className = "badge bg-secondary";
+                            spanElement.textContent = tagName;
+                            tagContainer.appendChild(spanElement);
+                        });
+                    </text>
+                }
+        }
+
+        function AddDescribe() {
+            @foreach (var mod in Model.Mods)
+                {
+                    <text>
+                        var description = '@Html.Raw(mod.Description)';
+                        var describe = $("#describe-id-@mod.ModId");
+
+                        var $description = $("<div>").html(description);
+                        $description.find("img").remove();
+
+                        describe.html($description.html());
+                    </text>
+                }
+        }
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            var params = new URLSearchParams(window.location.search);
+
+            $('#timeFilter').val(params.get('timeFilter') || "");
+            $('#sortFilter').val(params.get('sortFilter') || "uploadTime");
+            $('#orderFilter').val(params.get('orderFilter') || "desc");
+            $('#pageSize').val(params.get('pageSize') || "8");
+            $('#Search').val(params.get('searchString') || "");
+            $('#tagFilter').val(params.get('tagFilter') || "");
+        });
+    </script>
+
+    <script>
+        function loadPage(pageNumber) {
+            $.ajax({
+                url: '@Url.Action("Details")',
+                type: 'GET',
+                data: {
+                    page: pageNumber,
+                    searchString: $('#searchStringInput').val(),
+                    tagFilter: $('#tagFilterInput').val(),
+                    pageSize: $('#pageSize').val(),
+                    orderFilter: $('#orderFilter').val(),
+                    sortFilter: $('#sortFilter').val(),
+                    timeFilter: $('#timeFilter').val()
+
+                },
+                success: function (result) {
+                    $('.container.my-4.mod').html(result);
+
+                    $('html, body').animate({
+                        scrollTop: $('#modList').offset().top
+                    }, 0);
+                }
+            });
+        }
+    </script>
+
+    <script>
+        $('#CommissionSearchForm').on('submit', function (e) {
+            // 防止表單的預設提交行為
+            e.preventDefault();
+
+            // 重新載入分頁結果，從第一頁開始
+            loadCommissions(1);
+        });
+
+        loadCommissions(1);
+        CommissionsPageButton();
+
+        function loadCommissions(pageNumber) {
+            let CommissiontimeFilter = $('#CommissiontimeFilter').val();
+            let CommissionsortFilter = $('#CommissionsortFilter').val();
+            let CommissionorderFilter = $('#CommissionorderFilter').val();
+            let CommissionpageSize = $('#CommissionpageSize').val();
+            let CommissionsearchString = $('#CommissionSearch').val();
+            let GameId = "@Model.GameId";
+
+            $.ajax({
+                url: '/Games/CommissionsPartial',
+                data: { page: pageNumber, 
+                    id: GameId, 
+                    timeFilter: CommissiontimeFilter,
+                    sortFilter: CommissionsortFilter,
+                    orderFilter: CommissionorderFilter,
+                    pageSize: CommissionpageSize,
+                    searchString: CommissionsearchString
+                },
+                success: function (data) {
+                    $('#commissionsContainer').html(data);
+                    var totalPages = $('#totalPages').val();
+                    // 更新分頁
+                    updatePagination(pageNumber, totalPages);
+                }
+            });
+        }
+
+        function updatePagination(pageNumber, totalPages) {
+            // 先清除現有的分頁
+            $('#pagination').empty();
+
+            // 加入上一頁按鈕
+            $('#pagination').append('<li class="page-item ' + (pageNumber == 1 ? 'disabled' : '') + '" id="previous-page"><a class="page-link" href="#" data-page-number="' + (pageNumber - 1) + '" tabindex="-1" aria-disabled="true">Previous</a></li>');
+
+            // 動態生成頁碼
+            for (var i = 1; i <= totalPages; i++) {
+                $('#pagination').append('<li class="page-item ' + (i == pageNumber ? 'active' : '') + '"><a class="page-link" href="#" data-page-number="' + i + '">' + i + '</a></li>');
+            }
+
+            // 加入下一頁按鈕
+            $('#pagination').append('<li class="page-item ' + (pageNumber == totalPages ? 'disabled' : '') + '" id="next-page"><a class="page-link" href="#" data-page-number="' + (pageNumber + 1) + '">Next</a></li>');
+        }
+
+        function CommissionsPageButton(){
+            $(document).on('click', '.page-link', function (event) {
+                event.preventDefault();
+
+                var page = $(this).data('page-number');
+                loadCommissions(page);
+            });
+        }
+
+        $(document).ready(function () {
+            // 檢查sessionStorage是否有儲存滾動位置
+            if (sessionStorage.getItem('scrollPosition')) {
+                // 取得滾動位置並設定為當前滾動位置
+                $(window).scrollTop(sessionStorage.getItem('scrollPosition'));
+                // 使用後清除該儲存值
+                sessionStorage.removeItem('scrollPosition');
+            }
+
+            // 當表單提交時，儲存當前滾動位置
+            $('#filterForm').on('submit', function () {
+                var targetPosition = $('#myTarget').offset().top;  // 替換'#myTarget'為你的目標元素id
+                sessionStorage.setItem('scrollPosition', targetPosition);
+            });
+        });
+        </script>
+}

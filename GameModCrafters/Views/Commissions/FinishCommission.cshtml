@@ -1,0 +1,155 @@
+﻿@model GameModCrafters.Models.Commission
+@{
+    ViewData["Title"] = "FinishCommission";
+}
+
+<div class="container  Entrustcontainer">
+    <h1>委託明細</h1>
+    <div class="row">
+        <form method="get">
+            <label asp-for="DelegatorId">委託人</label>
+            <select asp-for="DelegatorId" class="form-control" asp-items="@ViewBag.DelegatorId" disabled></select>
+            <input type="hidden" class="form-control" asp-for="CommissionId" disabled>
+            <div class="mb-3">
+                <label asp-for="CommissionTitle" class="form-label">委託標題:</label>
+                <input class="form-control" asp-for="CommissionTitle" disabled>
+            </div>
+            <div class="mb-3">
+                <label asp-for="GameId" class="form-label">遊戲名稱:</label>
+                <select asp-for="GameId" type="hidden" class="form-control" asp-items="@ViewBag.GameName" disabled></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CommissionDescription" class="form-label">委託詳情:</label>
+                <div class="CommissionDescription">@Html.Raw(Model.CommissionDescription)</div>
+                <input asp-for="CommissionDescription" class="form-control" type="hidden" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Budget">預算:</label>
+                <input type="text" class="budgetinput" asp-for="Budget" disabled>
+            </div>
+           
+        </form>
+    </div>
+</div>
+@Html.AntiForgeryToken()
+
+@section css {
+    <link rel="stylesheet" href="~/css/CommissionsDetails.css" />
+}
+
+@section js {
+   @* <script>
+
+        $(() => {
+            MessageBtn();
+
+            FollowCommission();
+        })
+
+
+
+        function FollowCommission() {
+            // 綁定按鈕點擊事件
+            $("#followButton").click(function () {
+                console.log("@Url.Action("AddCommissionTracking", "Commissions")")
+                // 發送AJAX請求
+                $.ajax({
+                    headers: {
+                        RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    url: '@Url.Action("AddCommissionTracking", "Commissions")', // 請替換為實際的控制器和動作方法的路由
+                    type: "POST",
+                    data: {
+                        comId: "@Model.CommissionId" // 傳遞委託ID到後端
+                    },
+                    success: function (response) {
+                        // 請求成功後的處理程式碼
+                        console.log("委託追蹤新增成功");
+                        // 在此可以進行其他相關處理，例如更新頁面內容等
+
+                        if (response == '新增成功') {
+                            // 如果是新增追蹤，將按鈕文字設定為「取消追蹤委託」
+                            alert('追蹤成功');
+                            $("#followButton").text("取消追蹤");
+                        } else {
+                            alert('取消追蹤成功');
+                            // 如果是刪除追蹤，將按鈕文字設定為「追蹤委託」
+                            $("#followButton").text("追蹤委託");
+                        }
+
+                    },
+                    error: function (xhr, status, error) {
+                        // 請求失敗後的處理程式碼
+                        console.log("委託追蹤新增失敗");
+                        console.log(error);
+                    }
+                });
+            });
+        }
+
+        function MessageBtn() {
+            $("#MessageButton").on("click", () => {
+                $('#ChatBoxSpan').click();
+                var userEmail = '@Model.DelegatorId';
+                var existingButton = $('.room-link[data-room="' + userEmail + '"]');
+                if (existingButton.length > 0) {
+                    // 如果已經在列表中，則觸發click事件
+                    existingButton.click();
+                } else {
+                    $.get('/Home/GetUserByEmail?email=' + userEmail)
+                        .done(function (data) {
+                            var roomElement = '<div class="sliderroom"><button class="room-link btn" data-room="' + userEmail + '">' + userEmail + '</button></div>';
+                            $('#chatList').prepend(roomElement);
+
+                            $(".room-link").click(function () {
+                                var receiverId = $(this).data("room");
+                                // 获取并显示聊天记录
+                                $.get('/Home/GetChatHistoryWithUser?receiverId=' + receiverId, function (data) {
+                                    // 清空之前的聊天记录
+                                    $("#messagesList").empty();
+                                    // 添加新的聊天记录
+                                    data.forEach(function (message) {
+                                        var encodedMsg = message.messageContent;
+                                        var li = document.createElement("li");
+                                        var div = document.createElement("div");
+
+                                        if (message.senderId == currentEmail) {
+                                            li.className = "messageli rightli";
+                                            div.className = "messages right";
+                                        }
+                                        else {
+                                            li.className = "messageli leftli";
+                                            div.className = "messages right";
+                                        }
+
+                                        div.textContent = encodedMsg;
+                                        li.appendChild(div);
+                                        document.getElementById("messagesList").appendChild(li);
+                                    });
+                                });
+
+                                // 移除所有按鈕的 'active' 類別
+                                $(".room-link").removeClass("active");
+                                $(".sliderroom").removeClass("active");
+
+                                // 為被點擊的按鈕添加 'active' 類別
+                                $(this).addClass("active");
+                                $(this).parent(".sliderroom").addClass("active");
+                            });
+
+                            $('.room-link[data-room="' + userEmail + '"]').click();
+                        })
+                        .fail(function (jqXHR) {
+                            if (jqXHR.status == 404) {
+                                // User not found. Show an error message.
+                                alert(jqXHR.responseJSON.message);
+                            } else {
+                                // Some other error occurred.
+                                console.log("Error: " + jqXHR.status);
+                            }
+                        });
+                }
+            })
+        }
+    </script>*@
+}

@@ -1,0 +1,177 @@
+﻿@model RegisterViewModel
+<div class="registerwrap">
+    <div class="login">
+
+        <div class="text">
+            <h1>註冊新的帳戶</h1>
+            <div class="Sign_in">
+                <p>已經有帳戶了?</p>
+                <a asp-controller="Account" asp-action="LoginPage">登入</a>
+            </div>
+
+        </div>
+
+        @using (Html.BeginForm("RegisterPage", "Account", FormMethod.Post))
+        {
+            @*<form action="/Register/RegisterPage" method="post">*@
+
+            <div class="mb-3">
+                <label for="exampleInputUsername" class="form-label">使用者名稱</label>
+                <input asp-for="Username" name="Username" class="form-control" id="exampleInputUsername" aria-describedby="emailHelp">
+                <div id="username-error" class="text-danger"></div>
+                @Html.ValidationMessageFor(m=>m.Username,"",new{@class = "text-danger"})
+
+            </div>
+            @*
+            <div class="mb-3">
+                <label for="exampleInputEmail" class="form-label">電子郵件</label>
+                <input asp-for="Email" type="email" class="form-control" id="exampleInputEmail" aria-describedby="emailHelp">
+                <div id="emailHelp" class="form-text" style="color:gray">我們絕不會與其他任何人分享您的電子郵件。</div>
+                @Html.ValidationMessageFor(m=>m.Email,"",new{@class = "text-danger"})
+            </div>*@
+            <div class="mb-3">
+                <label for="Password1" class="form-label">密碼</label>
+                <input asp-for="Password1"  type="password" class="form-control" id="exampleInputPassword1"
+                       aria-labelledby="passwordHelpBlock">
+               
+
+                @Html.ValidationMessageFor(m=>m.Password1,"",new{@class = "text-danger"})
+            </div>
+            <div class="mb-3">
+                <label for="Password2" class="form-label">確認密碼</label>
+                <input asp-for="Password2"  type="password" class="form-control" id="exampleInputPassword2" aria-labelledby="passwordHelpBlock">
+
+                @Html.ValidationMessageFor(m=>m.Password2,"",new{@class = "text-danger"})
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">點擊確認</label>
+            </div>
+
+            <div class="d-grid col-12 mx-auto">
+                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled="">註冊</button>
+            </div>
+
+        }
+    </div>
+</div>
+
+    
+<script>
+    function ClickMeNotRobot() {
+        let checkbox = document.getElementById('exampleCheck1')
+        let submitBtn = document.getElementById('submitBtn')
+        checkbox.addEventListener('change', function () {
+            if (checkbox.checked) {
+                submitBtn.removeAttribute('disabled')
+            }
+            else {
+                submitBtn.setAttribute('disabled', true)
+            }
+        })
+    }
+    window.onload = function () {
+        ClickMeNotRobot()
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        $('#exampleInputUsername').on('input', function () {
+            var username = $(this).val();
+            var errorElement = $('#username-error');
+
+            if (username.length < 3 || username.length > 20) {
+                errorElement.text('使用者名稱必須介於 3 到 20 個字元之間。');
+                errorElement.show();
+            } else {
+                errorElement.hide();
+            }
+        });
+    });
+   
+</script>
+
+
+
+@section js{
+
+
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}
+@section css{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            background-color: gray;
+        }
+
+        .registerwrap {
+            width: 100%;
+            height: 100vh;
+            background-color: azure;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login {
+            max-width: 400px;
+            width: 100%;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+            .login .text {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .login .Sign_in {
+                display: flex;
+                margin-bottom: 20px;
+            }
+
+                .login .Sign_in p {
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+
+                .login .Sign_in a {
+                    text-decoration: none;
+                }
+
+                    .login .Sign_in a:hover {
+                        text-decoration: underline;
+                    }
+
+            .login form .mb-3 {
+                margin-bottom: 20px;
+            }
+
+            .login form .form-text {
+                color: red;
+            }
+
+            .login form label {
+                font-weight: bold;
+            }
+
+            .login form .form-control {
+                border-radius: 5px;
+            }
+
+            .login form .form-check-label {
+                font-weight: normal;
+            }
+
+            .login form #submitBtn {
+                width: 100%;
+                margin-top: 20px;
+            }
+    </style>
+}
+
+

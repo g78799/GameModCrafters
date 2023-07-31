@@ -1,0 +1,478 @@
+﻿@model ModDetailViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container " style="min-height: 100vh;">
+    <div class="row">
+        <div class="col-12 col-md-3 my-3">
+            <a asp-controller="Account" asp-action="OtherPage" asp-route-id="@Model.AuthorId" class="author" id="LinkToPerson">
+                <div class="card">
+                    <div class="pic">
+                        <img src="@Model.userCover">
+                    </div>
+                    <div class="authorData">
+                        <h3 class="name">@Model.AuthorName</h3>
+                        <div class="detail">
+                            <div> 作品數量：@Model.AuthorWorkCount</div>
+                            <div> 獲讚數：@Model.AuthorLikesReceived</div>
+                        </div>
+                    </div>
+                    <div class="avatar">
+                        <img src="@Model.userAtavar">
+                    </div>
+                </div>
+            </a>
+            @if (Model.AuthorName == User.Identity.Name)
+            {
+
+                <div class="ModOption mt-3">
+                    <button class="btn btn-primary me-3">
+                        <a asp-controller="Mods" asp-action="Edit" asp-route-id="@Model.ModId" style="color: white; text-decoration: none;">修改Mod資訊</a>
+                    </button>
+
+                    <form asp-action="Delete" asp-controller="Mods" asp-route-id="@Model.ModId" method="post" id="delete-form" style="display:inline;">
+                        <button type="button" class="btn btn-danger" id="delete-button">刪除Mod</button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <button class="btn btn-primary mt-3" id="MessageButton">
+                    私訊作者
+                </button>
+            }
+            
+        </div>
+        <div class="col-12 col-md-9">
+            <div class="content">
+                <h2>@Model.ModName</h2>
+                <div id="tag"></div>
+                <hr>
+                <div class="date_like">
+                    <h4>上傳日期：@Model.CreateTime 更新日期：@Model.UpdateTime</h4>
+                    <div class="like">
+                        <button type="button" class="btn btn-light @(Model.UserHasLiked ? "liked" : "")" id="like-btn">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span id="likeCount">@Model.LikeCount</span>
+                        </button>
+                        <button type="button" class="btn btn-light @(Model.UserHasFavorite ? "liked" : "")" id="favorite-btn">
+                            <i class="fas fa-star"></i>
+                            <span id="favoriteCount">@Model.FavoriteCount</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="introduction active" id="Description"></div>
+                <div class="introduction" id="InstallationInstructions">
+                    <div id="purchasePrompt" class="purchase-prompt">
+                        <p>您目前尚未擁有此Mod。這款Mod的售價為 <span id="modPrice"></span> 個 Mod Coins。確認購買並立即享有此Mod的完整體驗嗎?</p>
+                        <button id="purchaseButton" class="purchase-button">確認購買</button>
+                    </div>
+                </div>
+                <div class="introduction">
+                    <div id="comments-section">
+                        @await Html.PartialAsync("_CommentsPartial", Model)
+                    </div>
+                    <form id="comment-form">
+                        <div class="input-container">
+                            <input type="hidden" id="modId" value="@Model.ModId" />
+                            <input type="hidden" id="userId" value="@User.FindFirstValue(ClaimTypes.Email)" />
+                            <input type="text" id="content" class="input" placeholder="輸入你的留言" />
+                            <button type="submit" class="submit">提交</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tag-buttons">
+                    <button class="btn btn-outline-secondary btn_active">模組簡介</button>
+                    <button class="btn btn-outline-secondary">安裝方式</button>
+                    <button class="btn btn-outline-secondary">留言區</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="purchaseModal" tabindex="-1" role="dialog" aria-labelledby="purchaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="purchaseModalLabel">購買確認</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="purchaseMessage">正在加載...</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelPurchase" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="confirmPurchase">確認購買</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section css{
+    <link href="~/css/moddetailstyle.css" rel="stylesheet" />
+}
+
+@section js{
+    <script>
+        function LikeBtn(){
+            $("#like-btn").click(function () {
+                var $this = $(this);
+                $.ajax({
+                    url: '@Url.Action("Like", "Mods")',
+                    type: 'POST',
+                    data: {
+                        modId: '@Model.ModId'
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            // 點讚或取消點讚成功
+                            $('#likeCount').text(result.newLikeCount);
+
+                            // 更新按鈕的狀態
+                            if ($this.hasClass('liked')) {
+                                $this.removeClass('liked');
+                            } else {
+                                $this.addClass('liked');
+                            }
+                        }
+                        else {
+                            // 處理錯誤
+                            console.log(result.errorMessage);
+                        }
+                    }
+                });
+            });
+        }
+
+        function FavoriteBtn() {
+            $("#favorite-btn").click(function () {
+                var $this = $(this);
+                $.ajax({
+                    url: '@Url.Action("Favorite", "Mods")',
+                    type: 'POST',
+                    data: {
+                        modId: '@Model.ModId'
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            // 點讚或取消點讚成功
+                            $('#favoriteCount').text(result.newFavoriteCount);
+
+                            // 更新按鈕的狀態
+                            if ($this.hasClass('liked')) {
+                                $this.removeClass('liked');
+                            } else {
+                                $this.addClass('liked');
+                            }
+                        }
+                        else {
+                            // 處理錯誤
+                            console.log(result.errorMessage);
+                        }
+                    }
+                });
+            });
+        }
+    </script>
+
+    <script>
+       
+        $(document).ready(function () {
+            $(".tag-buttons button").on("click", function () {
+                var pageIndex = $(this).index();
+
+                $(".btn.btn-outline-secondary.btn_active").removeClass("btn_active");
+                $(".btn.btn-outline-secondary").eq(pageIndex).addClass("btn_active");
+
+                // Hide the currently active page and remove the active class
+                $(".introduction.active").removeClass("active").hide();
+
+                // Show the selected page and add the active class
+                $(".introduction").eq(pageIndex).addClass("active").show();
+            });
+
+            $("#Description").html('@Html.Raw(Model.Description)');
+
+            var userHasPurchased = '@Model.UserHasPurchased';
+            var authorId = '@Model.AuthorId';
+            var price = @Model.Price;
+            var userId = '@User.FindFirstValue(ClaimTypes.Email)';  // 從 Razor 中取得用戶ID
+
+            if (userHasPurchased == 'True' || authorId == userId || price == 0) {
+                // 如果用戶已經購買了該 mod 或用戶就是作者，則顯示安裝說明以及下載連結
+                let installationInstructions = "@Html.Raw(Model.InstallationInstructions)";
+                let downloadLink = "@Html.Raw(Model.DownloadLink)";
+                let content = installationInstructions + "<hr/> 下載連結：<a id='downloadLink' href='" + downloadLink + "'>點我下載</a>";
+
+                $("#InstallationInstructions").html(content);
+
+                $('#downloadLink').on('click', function (e) {
+                    e.preventDefault();  
+
+                    $.ajax({
+                        url: '/Mods/DownloadMod',
+                        type: 'POST',
+                        data: {
+                            modId: '@Model.ModId'  
+                        },
+                        success: function (response) {
+                            window.location.href = downloadLink;
+                        }
+                    });
+                });
+                $('#purchasePrompt').hide();  // 隱藏購買提示
+            } else {
+                // 否則，顯示購買提示
+                $('#modPrice').text('@Model.Price');  // 將 mod 的價格放入提示框
+                $('#purchasePrompt').show();  // 顯示購買提示
+            }
+
+            AddTag();
+        });
+
+        function AddTag() {
+            var tagContainer = $("#tag");
+            var tagNames = @Html.Raw(Json.Serialize(Model.Tags));
+            tagNames.forEach(function (tagName) {
+                var spanElement = document.createElement("span");
+                spanElement.className = "badge bg-secondary";
+                spanElement.textContent = tagName;
+                tagContainer.append(spanElement); 
+            });
+        }
+    </script>
+
+    <script>
+        function PurchaseEvent() {
+            $(document).ready(function () {
+                // 點擊購買按鈕時的事件處理器
+                $('#purchaseButton').on('click', function () {
+                    // 使用 AJAX 從服務器獲取用戶的 ModCoin 餘額和 mod 的價格
+                    $.get('/Account/GetUserModCoin', function (data) {
+                        // 購買提示訊息
+                        var purchaseMessage = '';
+                        if (data >= '@Model.Price') {
+                            purchaseMessage = '該Mod的價格為 ' + '@Model.Price' + ' Mod Coins，您當前的餘額為 ' + data + ' Mod Coins，餘額充足。';
+                            $('#confirmPurchase').on('click', function () {
+                                $.ajax({
+                                    url: '/Mods/PurchaseMod',
+                                    type: 'POST',
+                                    contentType: 'application/json',
+                                    data: JSON.stringify({ ModId: '@Model.ModId' }),
+                                    success: function (data) {
+                                        // 購買成功，更新模態視窗的文字並再次顯示
+                                        var successMessage = '購買成功\n你的帳戶中剩餘 ' + data.newModCoin + ' 個Mod Coin';
+                                        $('#purchaseMessage').text(successMessage);
+                                        $('#purchaseModal').modal('show');
+
+                                        // 更新按鈕的行為
+                                        $('#confirmPurchase').attr('onclick', '').unbind('click');
+                                        $('#cancelPurchase').hide();
+                                        $('#confirmPurchase').text("關閉視窗");
+                                        $('#confirmPurchase').on('click', function () {
+                                            $('#purchaseModal').modal('hide');
+                                            let installationInstructions = "@Html.Raw(Model.InstallationInstructions)";
+                                            let downloadLink = "@Html.Raw(Model.DownloadLink)";
+                                            let content = installationInstructions + "<hr/> 下載連結：<a id='downloadLink' href='" + downloadLink + "'>點我下載</a>";
+
+                                            $("#InstallationInstructions").html(content);
+
+                                            $('#downloadLink').on('click', function (e) {
+                                                e.preventDefault();  // 防止默認的鏈接行為
+
+                                                $.ajax({
+                                                    url: '/Mods/DownloadMod',
+                                                    type: 'POST',
+                                                    data: {
+                                                        modId: '@Model.ModId'  // 你需要將此處替換為實際的 modId
+                                                    },
+                                                    success: function (response) {
+                                                        // 在成功的回應後，直接導航到下載鏈接
+                                                        window.location.href = downloadLink;
+                                                    }
+                                                });
+                                            });
+                                            $('#purchasePrompt').hide();
+                                        });
+                                    },
+                                    error: function (jqXHR, textStatus, errorThrown) {
+                                        // 購買失敗，顯示錯誤訊息
+                                        alert(jqXHR.responseText || textStatus || errorThrown);
+                                    }
+                                });
+                            });
+                        } else {
+                            purchaseMessage = '該Mod的價格為 ' + '@Model.Price' + ' Mod Coins，您當前的餘額為 ' + data + ' Mod Coins，餘額不足，請儲值。';
+                            // 將 "確認購買" 按鈕連接到儲值頁面
+                            $('#confirmPurchase').on('click', function () {
+                                // 將當前頁面的 URL 存儲到 sessionStorage
+                                sessionStorage.setItem('redirectUrl', window.location.href);
+
+                                // 然後導向到儲值頁面
+                                location.href = "/Payments/StoredValue";
+                            });
+                            $('#confirmPurchase').text("前往儲值");
+                        }
+                        // 將購買提示訊息顯示在 Modal 中
+                        $('#purchaseMessage').text(purchaseMessage);
+                        // 顯示 Modal
+                        $('#purchaseModal').modal('show');
+                    });
+                });
+            });
+        }
+    </script>
+
+    <script>
+        function CommentSubmit(){
+            $("#comment-form").on("submit", function (e) {
+                e.preventDefault();
+                var modId = $("#modId").val();
+                var userId = $("#userId").val();
+                var content = $("#content").val();
+                $.ajax({
+                    url: '/Mods/CreateComment',
+                    type: 'POST',
+                    data: {
+                        modId: modId,
+                        userId: userId,
+                        content: content
+                    },
+                    success: function (result) {
+                        $("#content").val('');
+                        $("#comments-section").html(result);
+                        DeleteButton();
+                    }
+                });
+            });
+        }
+
+        function DeleteButton() {
+            $('.message').off('mouseenter mouseleave');
+            $('.delete-button').off('click');
+
+            $('.message').hover(function () {
+                $(this).find('.delete-button').show();
+            }, function () {
+                $(this).find('.delete-button').hide();
+            });
+
+            $('.delete-button').click(function () {
+                var modId = $("#modId").val();
+                var commentId = $(this).data('comment-id');
+                $.ajax({
+                    url: '/Mods/DeleteComment',
+                    type: 'POST',
+                    data: {
+                        modId: modId,
+                        commentId: commentId
+                    },
+                    success: function (result) {
+                        $("#comments-section").html(result);
+                        DeleteButton();
+                    }
+                });
+            });
+        }
+
+        function MessageBtn() {
+            $("#MessageButton").on("click", () => {
+                $('#ChatBoxSpan').click();
+                var userEmail = '@Model.AuthorId';
+                var existingButton = $('.room-link[data-room="' + userEmail + '"]');
+                if (existingButton.length > 0) {
+                    // 如果已經在列表中，則觸發click事件
+                    existingButton.click();
+                } else {
+                    $.get('/Home/GetUserByEmail?email=' + userEmail)
+                        .done(function (data) {
+                            var roomElement = '<div class="sliderroom"><button class="room-link btn" data-room="' + userEmail + '">' + userEmail + '</button></div>';
+                            $('#chatList').prepend(roomElement);
+
+                            $(".room-link").click(function () {
+                                var receiverId = $(this).data("room");
+                                // 获取并显示聊天记录
+                                $.get('/Home/GetChatHistoryWithUser?receiverId=' + receiverId, function (data) {
+                                    // 清空之前的聊天记录
+                                    $("#messagesList").empty();
+                                    // 添加新的聊天记录
+                                    data.forEach(function (message) {
+                                        var encodedMsg = message.messageContent;
+                                        var li = document.createElement("li");
+                                        var div = document.createElement("div");
+
+                                        if (message.senderId == currentEmail) {
+                                            li.className = "messageli rightli";
+                                            div.className = "messages right";
+                                        }
+                                        else {
+                                            li.className = "messageli leftli";
+                                            div.className = "messages right";
+                                        }
+
+                                        div.textContent = encodedMsg;
+                                        li.appendChild(div);
+                                        document.getElementById("messagesList").appendChild(li);
+                                    });
+                                });
+
+                                // 移除所有按鈕的 'active' 類別
+                                $(".room-link").removeClass("active");
+                                $(".sliderroom").removeClass("active");
+
+                                // 為被點擊的按鈕添加 'active' 類別
+                                $(this).addClass("active");
+                                $(this).parent(".sliderroom").addClass("active");
+                            });
+
+                            $('.room-link[data-room="' + userEmail + '"]').click();
+                        })
+                        .fail(function (jqXHR) {
+                            if (jqXHR.status == 404) {
+                                // User not found. Show an error message.
+                                alert(jqXHR.responseJSON.message);
+                            } else {
+                                // Some other error occurred.
+                                console.log("Error: " + jqXHR.status);
+                            }
+                        });
+                }
+            })
+        }
+
+        $(document).ready(function () {
+            CommentSubmit();
+            DeleteButton();
+            LikeBtn();
+            FavoriteBtn();
+            MessageBtn();
+            PurchaseEvent();
+        });
+    </script>
+
+    <script>
+        document.getElementById('delete-button').addEventListener('click', function (e) {
+            e.preventDefault();
+            Swal.fire({
+                title: '你確定嗎?',
+                text: "你將無法還原此操作！",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '確認刪除',
+                cancelButtonText: '取消'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form').submit();
+                }
+            })
+        });
+    </script>
+}

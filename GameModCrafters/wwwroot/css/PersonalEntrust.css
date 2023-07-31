@@ -1,0 +1,25 @@
+﻿body {
+    background-color: azure;
+}
+
+.Entrust {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 56%;
+    box-sizing:border-box;
+    border:5px solid #808080;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.ck.ck-content {
+    min-height: 200px;
+}
+
+.btnCantaner {
+    display: flex;
+    width: 100%;
+    gap: 5px;
+}
+
+

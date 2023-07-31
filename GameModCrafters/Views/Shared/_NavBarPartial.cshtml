@@ -1,0 +1,93 @@
+﻿
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">GameModCrafters</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <form class="d-flex" role="search" id="searchForm" asp-action="SearchResult" asp-controller="Home">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="keyword">
+                <button class="btn btn-outline-light rounded" type="button" id="search_btn">Search</button>
+                <div id="searchResults" ></div>
+            </form>
+            
+            <ul class="navbar-nav ms-3">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="ModMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Mod
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="ModMenuLink">
+                        <li><a class="dropdown-item" href="#">瀏覽的Mod</a></li>
+                        <li><a class="dropdown-item" href="#">下載的Mod</a></li>
+                        <li><a class="dropdown-item" href="#">收藏的Mod</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-3">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="CommissionMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        委託
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="CommissionMenuLink">
+                        <li><a class="dropdown-item" href="~/Commissions/PublishedCommission">發佈的委託</a></li>
+                        <li><a class="dropdown-item" href="~/Commissions/GetAllTrackingCommission">追蹤的委託</a></li>
+                        <li><a class="dropdown-item" href="~/Commissions/GetAllCommission">所有委託</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-3">
+                <li class="nav-item">
+                    <a class="nav-link" href="~/Payments/Index">儲值中心</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0" style="display: flex; align-items: center;">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link active" id="notification-link" href="#">
+                            <i class="fa fa-bell" id="bell"></i>
+                            <span id="notification-count" class="badge badge-light">0</span>
+                        </a>
+                        <ul id="notification-list" class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown"></ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" id="navbarname" tabindex="0" role="button" data-bs-toggle="popover">
+                            <img id="popover-avatar" />
+                            <div id="divuser" style="margin-left:10px;">@User.Identity.Name</div>
+                        </a>
+                        <div id="popover-content" style="display: none">
+                            <div id="imformationList">
+                                <p class="border-bottom"><strong>ModCoin: </strong><span id="popover-modcoin"></span></p>
+                                <a class="nav-link active  border-bottom" aria-current="page" asp-controller="Account" asp-action="PersonPage">個人專區</a>
+                                <a href="~/Transactions/Create" class="d-block border-bottom pt-3">發起交易</a>
+                                <a href="~/Transactions/Index" class="d-block border-bottom pt-3">交易列表</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-light" asp-controller="Account" asp-action="Signout">登出</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link active"
+                           aria-current="page"
+                           asp-controller="Account"
+                           asp-action="LoginPage"
+                           asp-route-returnUrl="@Context.Request.Path">登入</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="RegisterPage">註冊</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,187 @@
+﻿@model GameModCrafters.Models.Transaction
+@{
+    ViewData["Title"] = "ViewFinishedCommission";
+}
+
+<div class="main-bothside my-4">
+    <h2>驗收成品</h2>
+    <hr />
+    <div class="form">
+        <div class="item-group">
+            <div class="item">
+                <label class="col-sm-2" for="Commission">@Html.DisplayNameFor(model => model.Commission)</label>
+                <div class="col-sm-10" id="Commission">
+                    <a href="/Commissions/Details/@Html.DisplayFor(model => model.Commission.CommissionId)">@Html.DisplayFor(model => model.Commission.CommissionTitle)</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="item-group">
+            <div class="item">
+                <label class="col-sm-2" for="Payer">@Html.DisplayNameFor(model => model.Payer)</label>
+                <div class="col-sm-10" id="Payer">
+                    @Html.DisplayFor(model => model.Payer.Username) (@Html.DisplayFor(model => model.Payer.Email))
+                </div>
+            </div>
+
+            <div class="item">
+                <label class="col-sm-2" for="Payee">@Html.DisplayNameFor(model => model.Payee)</label>
+                <div class="col-sm-10" id="Payee">
+                    @Html.DisplayFor(model => model.Payee.Username) (@Html.DisplayFor(model => model.Payee.Email))
+                </div>
+            </div>
+        </div>
+
+        <div class="item-group">
+            <div class="item">
+                <label class="col-sm-2" for="CreateTime">@Html.DisplayNameFor(model => model.CreateTime)</label>
+                <div class="col-sm-10" id="CreateTime">
+                    @Html.DisplayFor(model => model.CreateTime)
+                </div>
+            </div>
+
+            <div class="item">
+                <label class="col-sm-2" for="Budget">@Html.DisplayNameFor(model => model.Budget)</label>
+                <div class="col-sm-10" id="Budget">
+                    @Html.DisplayFor(model => model.Budget) Mod Coin
+                </div>
+            </div>
+        </div>
+
+        <div class="item-group">
+            <div class="textarea-item">
+                <label class="col-sm-2" for="Describe">@Html.DisplayNameFor(model => model.Describe)</label>
+                <div class="col-sm-10" id="Describe">
+                    @Html.DisplayFor(model => model.Describe)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <a class="btn-item" id="downloadLink" href="#">點此下載檔案</a>
+    </div>
+</div>
+
+@if (Model.IsReceive && !Model.IsConfirm)
+{
+    <div class="main-bothside my-4">
+        <div class="confirmPart">
+            <div>確認成品無誤後 請點擊確認並撥款給作者</div>
+            <button type="button" class="btn-item" data-bs-toggle="modal" data-bs-target="#exampleModal" id="ModalBtn">
+                確認及撥款
+            </button>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">確認撥款？</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                確認成品品質符合需求<br />將交易預算 @Model.Budget 個Mod Coin交給作者(@Model.Payee.Username)？
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="ConfirmBtn">確定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<img id="gifImage" src="~/PreviewImage/buli.gif">
+
+@section css{
+    <link rel="stylesheet" href="~/css/DetailsTransactionStyle.css" />
+}
+
+@section js{
+    <script>
+        $('#downloadLink').on('click', function (e) {
+            var downloadLink = "@Html.Raw(Model.FileURL)";
+            e.preventDefault();
+
+            $.ajax({
+                url: '/Transactions/DownloadFile',
+                type: 'POST',
+                data: {
+                    transactionId: '@Model.TransactionId'
+                },
+                success: function (response) {
+                    window.location.href = downloadLink;
+                    setTimeout(function () {
+                        location.reload();
+                    }, 200);  
+                }
+            });
+        });
+
+        $("#ModalBtn").on("click", () => {
+            $.ajax({
+                url: '/Transactions/ConfirmedAmount',
+                type: 'POST',
+                data: {
+                    transactionId: '@Model.TransactionId'
+                },
+                success: function (data) {
+                    if (data == "餘額不足"){
+                        $("#ConfirmBtn").removeClass('btn-primary').addClass('btn-danger').text("餘額不足 前往儲值");
+
+                        $("#ConfirmBtn").on("click", () => {
+                            // 將當前頁面的 URL 存儲到 sessionStorage
+                            sessionStorage.setItem('redirectUrl', window.location.href);
+
+                            // 然後導向到儲值頁面
+                            location.href = "/Payments/StoredValue";
+                        })
+                    }
+                    else{
+                        $("#ConfirmBtn").on("click", () => {
+                            $.ajax({
+                                url: '/Transactions/ConfirmTransaction',
+                                type: 'POST',
+                                data: {
+                                    transactionId: '@Model.TransactionId'
+                                },
+                                success: function (response) {
+                                    window.location.href = response;
+                                }
+                            })
+                        })
+                    }
+                }
+            });
+        })
+
+        var img = document.getElementById('gifImage');
+        var speed = 2;
+        var direction = { x: speed, y: speed };
+        img.style.transform = 'scaleX(-1)';
+
+        img.style.left = img.offsetWidth / 2 + 'px';
+        img.style.top = (window.innerHeight / 2 - img.offsetHeight / 2) + 'px';
+
+        function animate() {
+            var rect = img.getBoundingClientRect();
+            if (rect.left < 0 || rect.right > window.innerWidth) {
+                direction.x = -direction.x;
+
+                img.style.transform = direction.x > 0 ? 'scaleX(-1)' : 'scaleX(1)';
+            }
+            if (rect.top < 0 || rect.bottom > window.innerHeight) {
+                direction.y = -direction.y;
+            }
+
+            img.style.left = (img.offsetLeft + direction.x) + 'px';
+            img.style.top = (img.offsetTop + direction.y) + 'px';
+
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+    </script>
+}
